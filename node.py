@@ -140,6 +140,19 @@ def register_node():
 
     return jsonify(response), 201
 
+@app.route('/nodes/register/chain', methods=['POST']) #add new node to nodes list
+def register_node_chain():
+    values = request.get_json()
+
+    nodes = values.get('nodes')
+    if nodes is None:
+        return 'Error: Please supply  a valid list of nodes', 400
+
+    response = requests.post(f"http://127.0.0.1:5000/nodes/register", json={"nodes": f"{nodes}"})
+    
+
+    return response.content, 201
+
 @app.route('/smart/chain', methods=['GET']) #update local (remote) chain
 def smart_chain():
     replaced = blockchain.smart_chain()
@@ -169,4 +182,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     port = args.port
 
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)

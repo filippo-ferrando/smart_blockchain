@@ -2,6 +2,8 @@ import hashlib
 import json
 from urllib import response
 
+from os.path import exists
+
 import requests
 import config
 from time import time
@@ -45,6 +47,8 @@ class Smart_Blockchain:
 
     def register_node(self, address):
         parsed_url = urlparse(address)
+        #if exists(f"./wallets/{parsed_url.netloc[1:-1]}") or exists(f"./wallets/{parsed_url.path[1:-1]}"):  wallet creation TODO
+
         if parsed_url.netloc:
             self.nodes.add(parsed_url.netloc)
         elif parsed_url.path:
@@ -69,6 +73,9 @@ class Smart_Blockchain:
     @property
     def last_block(self):
         return self.chain[-1]
+
+    def node_list(self):
+        return self.nodes
 
     @staticmethod
     def hash(block):
@@ -131,11 +138,10 @@ def full_chain():
 @app.route('/nodes/register', methods=['POST'])
 def register_node():
     values = request.get_json()
-
     nodes = values.get('nodes')
+    nodes = nodes.strip('][').split(',')
     if nodes is None:
         return 'Error: Please supply  a valid list of nodes', 400
-
     for node in nodes:
         blockchain.register_node(node)
 
@@ -165,6 +171,16 @@ def smart_chain():
 
     return jsonify(response), 200
 
+@app.route('/retrive/node', methods=['GET'])
+def retrive_node():
+    #print(str(blockchain.nodes))
+    response = {
+        'message': 'Nodes are',
+        'nodes': str(blockchain.nodes),
+    }
+
+    return jsonify(response), 200
+
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
@@ -175,4 +191,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     port = args.port
 
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
