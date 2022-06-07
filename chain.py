@@ -41,7 +41,6 @@ class Smart_Blockchain:
             'recipient': recipient,
             'amount_receive': amount * 0.99995,
         })
-        config.write_amount(config.BPSC_WALLET, amount * config.FEE)
         return self.last_block['index'] + 1
 
     def register_node(self, address):
